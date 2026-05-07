@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { projects } from "@/data/projects";
+import ThumbnailHover from "@/components/ThumbnailHover";
 
 // Explicit column spans per project position — adjust here to change rhythm.
 // Each row must sum to 12.
@@ -17,24 +18,19 @@ const SPAN_CLASSES: Record<number, string> = {
 
 export default function Home() {
   return (
-    <div className="pt-32 pb-32">
-      <div className="px-3 grid grid-cols-12 gap-4">
+    // pt-[112px] = header (88px) + row-gap (24px) so space above first thumbnail
+    // matches the gap between rows exactly.
+    <div className="pt-[104px] pb-16">
+      <div className="px-4 md:px-6 grid grid-cols-12 gap-x-4 gap-y-4">
         {projects.map((project, index) => {
           const span = GRID_RHYTHM[index] ?? 4;
           return (
             <Link
               key={project.slug}
               href={`/work/${project.slug}`}
-              className={`block ${SPAN_CLASSES[span]}`}
+              className={`block self-start ${SPAN_CLASSES[span]}`}
             >
-              <div className="w-full aspect-video bg-[#1A1A1A]" />
-              <div className="pl-1 mt-3 flex items-baseline gap-6 text-[12px]">
-                <span className="text-[#888888] tabular-nums shrink-0">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <span className="text-[#EDEDED]">{project.title}</span>
-                <span className="text-[#888888]">{project.client}</span>
-              </div>
+              <ThumbnailHover project={project} index={index} />
             </Link>
           );
         })}

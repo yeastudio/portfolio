@@ -6,6 +6,7 @@ export type Project = {
   roles: string[];
   videoProvider: "vimeo" | "youtube" | "none";
   videoId: string;
+  videoHash?: string;
   videoUrl: string;
   description?: string;
   thumbnail?: string;
@@ -13,6 +14,8 @@ export type Project = {
   category: "commercial" | "music-video" | "dance" | "personal" | "narrative";
   featured: boolean;
   isUnreleased: boolean;
+  hoverVideoUrl?: string;
+  indexHoverVideo?: string;
 };
 
 export const projects: Project[] = [
@@ -31,7 +34,7 @@ export const projects: Project[] = [
   },
   {
     slug: "zenobia-pay-yc-launch-film",
-    title: "Zenobia Pay YC Launch Film",
+    title: "YC Launch Film",
     client: "Zenobia Pay",
     year: 2025,
     roles: ["Director", "DP", "Editor", "Colorist", "Sound"],
@@ -57,7 +60,7 @@ export const projects: Project[] = [
   },
   {
     slug: "stockline-yc-launch-film",
-    title: "Stockline YC Launch Film",
+    title: "YC Launch Film",
     client: "Stockline Inc",
     year: 2025,
     roles: ["Director", "Colorist"],
@@ -87,9 +90,10 @@ export const projects: Project[] = [
     client: "Jourden Cox",
     year: 2025,
     roles: ["Director", "DP", "Editor", "Colorist"],
-    videoProvider: "youtube",
-    videoId: "Axp2OZO8Bpg",
-    videoUrl: "https://www.youtube.com/watch?v=Axp2OZO8Bpg",
+    videoProvider: "vimeo",
+    videoId: "1189886613",
+    videoHash: "8358a83ffb",
+    videoUrl: "https://vimeo.com/1189886613/8358a83ffb",
     category: "music-video",
     featured: false,
     isUnreleased: false,
@@ -152,11 +156,11 @@ export const projects: Project[] = [
     client: "Confidential",
     year: 2026,
     roles: ["Director", "Editor", "Colorist"],
-    videoProvider: "none",
-    videoId: "",
-    videoUrl: "",
+    videoProvider: "vimeo",
+    videoId: "1189635172",
+    videoUrl: "https://vimeo.com/1189635172",
     category: "commercial",
     featured: false,
-    isUnreleased: true,
+    isUnreleased: false,
   },
 ];

@@ -193,7 +193,7 @@ export default function InfoPage() {
       {/* Portrait — tablet/desktop: top-right */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/propic.jpg"
+        src="/images/propic.jpg"
         alt="Andrew Ye"
         className="absolute hidden md:block h-[70vh] w-auto object-contain pointer-events-none select-none"
         style={{ left: "50vw", maxWidth: "46vw", top: "8vh" }}
@@ -207,7 +207,7 @@ export default function InfoPage() {
         {/* Portrait — mobile: sits directly above the text */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/propic.jpg"
+          src="/images/propic.jpg"
           alt="Andrew Ye"
           className="block md:hidden w-auto object-contain pointer-events-none select-none mb-6"
           style={{ height: "28vh", maxWidth: "80vw" }}

@@ -8,7 +8,7 @@ export default function Header() {
       <div className="flex items-center gap-4">
         <NavLink href="/">Work</NavLink>
         <NavLink href="/info">Info</NavLink>
-        <NavLink href="/index">Index</NavLink>
+        <NavLink href="/archive">Index</NavLink>
       </div>
     </header>
   );

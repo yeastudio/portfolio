@@ -99,8 +99,7 @@ export default function ThumbnailHover({ project, index, constrainAspect }: Prop
               objectFit: constrainAspect ? "cover" : undefined,
               objectPosition: constrainAspect ? (project.thumbnailObjectPosition ?? "center") : undefined,
               filter: project.isUnreleased ? "url(#mosaic-pixelate)" : undefined,
-              opacity: isHovered && videoReady && project.indexHoverVideo ? 0 : 1,
-              transition: "opacity 300ms",
+              opacity: 1,
             }}
           />
           {project.indexHoverVideo && (

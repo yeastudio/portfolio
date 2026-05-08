@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import CursorProvider from "@/components/CursorProvider";
 import GrainOverlay from "@/components/GrainOverlay";
 import PageTransition from "@/components/PageTransition";
+import LoadingBar from "@/components/LoadingBar";
 
 const generalSans = localFont({
   src: [
@@ -51,6 +52,7 @@ export default function RootLayout({
             </filter>
           </defs>
         </svg>
+        <LoadingBar />
         <GrainOverlay />
         <CursorProvider>
           <Header />

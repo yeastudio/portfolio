@@ -1,12 +1,9 @@
-export const dynamicParams = false;
-
 import { notFound } from "next/navigation";
 import { projects } from "@/data/projects";
 import ProjectClient from "@/components/ProjectClient";
 
 type Props = {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
 export async function generateStaticParams() {
@@ -21,22 +18,20 @@ export async function generateMetadata({ params }: Props) {
   };
 }
 
-export default async function ProjectPage({ params, searchParams }: Props) {
+export default async function ProjectPage({ params }: Props) {
   const { slug } = await params;
-  const sp = await searchParams;
 
   const project = projects.find((p) => p.slug === slug);
   if (!project) notFound();
 
   const projectIndex = projects.findIndex((p) => p.slug === slug);
-  const autoplay = sp?.autoplay === "1";
 
   return (
     <ProjectClient
       project={project}
       allProjects={projects}
       projectIndex={projectIndex}
-      autoplay={autoplay}
+      autoplay={false}
     />
   );
 }

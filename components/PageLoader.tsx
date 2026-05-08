@@ -61,7 +61,7 @@ export default function PageLoader() {
   return (
     // z-40 keeps us below the header (z-50) so nav stays visible
     <div
-      className="fixed inset-0 z-40 flex items-center justify-center bg-[#0B0A09]"
+      className="fixed inset-0 z-40 flex items-center justify-center bg-[var(--background)]"
       style={{
         opacity,
         transition: phase === "fading" ? "opacity 500ms ease" : "none",

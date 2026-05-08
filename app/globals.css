@@ -1,15 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0B0A09;
+  --background: #050505;
   --foreground: #EAE6E0;
   --secondary: #888880;
   --border: #1E1C1A;
+  --accent: #3D6B9E;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-accent: var(--accent);
   --font-sans: var(--font-general-sans);
   --font-serif: var(--font-newsreader);
 }
@@ -43,6 +45,16 @@ html {
   scrollbar-width: thin;
   scrollbar-color: #333333 transparent;
   scrollbar-gutter: stable;
+}
+
+::selection {
+  background: #EAE6E0;
+  color: #0B0A09;
+}
+
+@keyframes pageFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 /* Hide system cursor on hover-capable devices */

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Project } from "@/data/projects";
+import { Project, getDisplayTitle } from "@/data/projects";
 
 // ─── Utilities ────────────────────────────────────────────────────────────────
 
@@ -152,6 +152,7 @@ function VimeoControls({
 
   const handleScrubberMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
+    const wasPlaying = isPlaying;
     isDraggingRef.current = true;
     setIsDragging(true);
     setDragProgress(getScrubberProgress(e.clientX));
@@ -162,7 +163,10 @@ function VimeoControls({
     const onUp = (ev: MouseEvent) => {
       const p = getScrubberProgress(ev.clientX);
       const seekTime = p * duration;
-      playerRef.current?.setCurrentTime(seekTime);
+      playerRef.current?.setCurrentTime(seekTime).then(() => {
+        if (wasPlaying) playerRef.current?.play();
+        else playerRef.current?.pause();
+      });
       setCurrentTime(seekTime);
       isDraggingRef.current = false;
       setIsDragging(false);
@@ -208,6 +212,7 @@ function VimeoControls({
           className="relative py-3 -my-3"
           data-cursor="scrub"
           onMouseDown={(e) => { e.stopPropagation(); handleScrubberMouseDown(e); }}
+          onClick={(e) => e.stopPropagation()}
         >
           <div className="relative h-[2px] bg-[#EAE6E0]/20 pointer-events-none">
             <div
@@ -359,46 +364,34 @@ function HeroSection({
       style={{ opacity: heroOpacity, transition: "opacity 200ms ease" }}
     >
       {/* Background */}
+      {project.thumbnail ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={project.thumbnail}
+          alt=""
+          className="absolute inset-0 w-full h-full"
+          style={{
+            objectFit: "contain",
+            objectPosition: "top center",
+            filter: project.isUnreleased ? "url(#mosaic-pixelate)" : undefined,
+          }}
+        />
+      ) : (
+        <div
+          className="absolute inset-0"
+          style={{
+            background: "radial-gradient(ellipse at center, #1E1C1A 0%, #0B0A09 100%)",
+          }}
+        />
+      )}
+
+      {/* Clickable play region — full hero above bottom bar */}
       <div
         className="absolute inset-0"
-        style={
-          project.thumbnail
-            ? {
-                backgroundImage: `url(${project.thumbnail})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }
-            : {
-                background:
-                  "radial-gradient(ellipse at center, #1E1C1A 0%, #0B0A09 100%)",
-              }
-        }
-      />
-
-      {/* Clickable region: everything above the bottom bar */}
-      <div
-        className="absolute inset-0 bottom-20 flex flex-col items-center justify-center"
+        style={{ bottom: "80px" }}
         data-cursor={project.isUnreleased ? undefined : "play"}
         onClick={handleHeroClick}
-      >
-        <div className="text-center px-6 pointer-events-none select-none">
-          <h1
-            className="text-[36px] md:text-[56px] leading-none mb-4"
-            style={{
-              fontFamily: "var(--font-serif)",
-              fontWeight: 300,
-              fontStyle: "italic",
-              letterSpacing: "-0.01em",
-              color: "#EAE6E0",
-            }}
-          >
-            {project.title}
-          </h1>
-          <p className="text-[11px] tracking-wider uppercase text-[#888880]">
-            {num} — {project.client} — {project.year}
-          </p>
-        </div>
-      </div>
+      />
 
       {/* Unreleased overlay message */}
       <div
@@ -408,22 +401,47 @@ function HeroSection({
           transition: "opacity 400ms ease",
         }}
       >
-        <span className="text-[11px] tracking-wider uppercase text-[#888880] bg-[#0B0A09]/80 px-4 py-2">
+        <span className="text-[11px] tracking-wider uppercase text-[#888880] bg-[#050505]/80 px-4 py-2">
           Coming {project.year}
         </span>
       </div>
 
-      {/* Bottom bar — not part of the PLAY zone */}
-      <div className="absolute bottom-0 left-0 right-0 px-6 md:px-12 pb-8 flex items-end justify-between pointer-events-none">
-        <button
-          className="text-[11px] tracking-wider uppercase text-[#888880] hover:text-[#EAE6E0] transition-colors duration-150 pointer-events-auto"
-          onClick={(e) => { e.stopPropagation(); onScrollToDetails(); }}
-        >
-          More Info ↓
-        </button>
-        <span className="text-[11px] tracking-wider uppercase text-[#888880]">
-          {abbrevRoles}
-        </span>
+      {/* Bottom bar — title, meta, roles, more info all on one level */}
+      <div className="absolute bottom-0 left-0 right-0 px-6 md:px-12 pb-8 flex items-end justify-between gap-8 pointer-events-none">
+        {/* Left: number + title + client/year */}
+        <div className="flex items-baseline gap-4 min-w-0">
+          <span className="text-[11px] tracking-wider uppercase text-[#888880] tabular-nums shrink-0">
+            {num}
+          </span>
+          <h1
+            className="text-[24px] md:text-[36px] leading-none uppercase truncate"
+            style={{
+              fontFamily: "var(--font-serif)",
+              fontWeight: 300,
+              fontStyle: "italic",
+              letterSpacing: "0.05em",
+              color: "#EAE6E0",
+            }}
+          >
+            {getDisplayTitle(project)}
+          </h1>
+          <span className="text-[11px] tracking-wider uppercase text-[#888880] shrink-0 hidden md:inline">
+            {project.client} — {project.year}
+          </span>
+        </div>
+
+        {/* Right: roles + more info */}
+        <div className="flex items-center gap-6 shrink-0">
+          <span className="text-[11px] tracking-wider uppercase text-[#888880] hidden md:inline">
+            {abbrevRoles}
+          </span>
+          <button
+            className="text-[11px] tracking-wider uppercase text-[#888880] hover:text-[#EAE6E0] transition-colors duration-150 pointer-events-auto"
+            onClick={(e) => { e.stopPropagation(); onScrollToDetails(); }}
+          >
+            More Info ↓
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -439,7 +457,10 @@ function DetailsSection({ project }: { project: Project }) {
       <div className="grid grid-cols-12 gap-x-8">
         {project.description && (
           <div className="col-span-12 md:col-span-4 mb-12 md:mb-0">
-            <p className="text-[16px] font-light leading-[1.7] text-[#EAE6E0]">
+            <p
+              className="text-[17px] leading-[1.75] text-[#EAE6E0]"
+              style={{ fontFamily: "var(--font-serif)", fontWeight: 300 }}
+            >
               {project.description}
             </p>
           </div>
@@ -452,20 +473,20 @@ function DetailsSection({ project }: { project: Project }) {
           }`}
         >
           <div className="grid grid-cols-[max-content_1fr] gap-y-3 gap-x-8">
-            <span className="text-[11px] uppercase tracking-wider text-[#888880] self-center">
+            <span className="text-[12px] uppercase tracking-wider text-[#888880] self-center">
               Roles
             </span>
-            <span className="text-[14px] text-[#EAE6E0]">{abbrevRoles}</span>
+            <span className="text-[16px] text-[#EAE6E0]">{abbrevRoles}</span>
 
-            <span className="text-[11px] uppercase tracking-wider text-[#888880] self-center">
+            <span className="text-[12px] uppercase tracking-wider text-[#888880] self-center">
               Client
             </span>
-            <span className="text-[14px] text-[#EAE6E0]">{project.client}</span>
+            <span className="text-[16px] text-[#EAE6E0]">{project.client}</span>
 
-            <span className="text-[11px] uppercase tracking-wider text-[#888880] self-center">
+            <span className="text-[12px] uppercase tracking-wider text-[#888880] self-center">
               Year
             </span>
-            <span className="text-[14px] text-[#EAE6E0]">{project.year}</span>
+            <span className="text-[16px] text-[#EAE6E0]">{project.year}</span>
           </div>
         </div>
       </div>
@@ -550,21 +571,26 @@ function PrevNextCard({
             backgroundImage: `url(${project.thumbnail})`,
             opacity: hovered ? 0.15 : 0,
             transition: "opacity 300ms ease",
+            filter: project.isUnreleased ? "url(#mosaic-pixelate)" : undefined,
           }}
         />
       )}
       <div className="relative">
-        <p className="text-[11px] tracking-wider uppercase text-[#888880] mb-4">
+        <p className="text-[11px] tracking-wider uppercase mb-4" style={{ color: "#3D6B9E" }}>
           {direction === "prev" ? "Prev" : "Next"}
         </p>
         <p
-          className="text-[24px] md:text-[32px] font-light"
+          className="text-[24px] md:text-[32px] uppercase"
           style={{
+            fontFamily: "var(--font-serif)",
+            fontWeight: 300,
+            fontStyle: "italic",
+            letterSpacing: "0.04em",
             color: hovered ? "#EAE6E0" : "#C8C4BE",
             transition: "color 300ms ease",
           }}
         >
-          {project.title}
+          {getDisplayTitle(project)}
         </p>
         <p className="text-[11px] tracking-wider uppercase text-[#888880] mt-2">
           {project.client} — {project.year}

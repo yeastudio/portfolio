@@ -5,12 +5,8 @@ import "./globals.css";
 import Header from "@/components/Header";
 import CursorProvider from "@/components/CursorProvider";
 import GrainOverlay from "@/components/GrainOverlay";
+import PageTransition from "@/components/PageTransition";
 
-// General Sans — place font files in /public/fonts/general-sans/
-// Expected filenames from Fontshare download:
-//   GeneralSans-Light.woff2   (300)
-//   GeneralSans-Regular.woff2 (400)
-//   GeneralSans-Medium.woff2  (500)
 const generalSans = localFont({
   src: [
     { path: "../public/fonts/general-sans/GeneralSans-Light.woff2", weight: "300", style: "normal" },
@@ -43,10 +39,24 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${generalSans.variable} ${newsreader.variable} h-full`}>
       <body className="min-h-full flex flex-col bg-[#0B0A09] text-[#EAE6E0] antialiased">
+        {/* SVG filter definitions — globally available for mosaic pixelation on unreleased projects */}
+        <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true" focusable="false">
+          <defs>
+            <filter id="mosaic-pixelate" x="0" y="0" width="100%" height="100%">
+              <feFlood x="20" y="20" height="2" width="2" />
+              <feComposite width="40" height="40" />
+              <feTile result="a" />
+              <feComposite in="SourceGraphic" in2="a" operator="in" />
+              <feMorphology operator="dilate" radius="20" />
+            </filter>
+          </defs>
+        </svg>
         <GrainOverlay />
         <CursorProvider>
           <Header />
-          <main className="flex-1">{children}</main>
+          <main className="flex-1">
+            <PageTransition>{children}</PageTransition>
+          </main>
         </CursorProvider>
       </body>
     </html>

@@ -1,93 +1,39 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { useState, useEffect, useRef, useCallback } from "react";
-
-interface GlitchState {
-  fontFamily: string;
-  fontWeight: number;
-  fontStyle: string;
-  letterSpacing: string;
-}
-
-const STATES: GlitchState[] = [
-  // 0 — settled final: General Sans 500
-  { fontFamily: "var(--font-sans)", fontWeight: 500, fontStyle: "normal", letterSpacing: "0.1em" },
-  // 1 — Newsreader italic 300
-  { fontFamily: "var(--font-serif)", fontWeight: 300, fontStyle: "italic", letterSpacing: "0.1em" },
-  // 2 — General Sans 300 stretched
-  { fontFamily: "var(--font-sans)", fontWeight: 300, fontStyle: "normal", letterSpacing: "0.3em" },
-  // 3 — Newsreader 400 upright
-  { fontFamily: "var(--font-serif)", fontWeight: 400, fontStyle: "normal", letterSpacing: "0.1em" },
-  // 4 — General Sans 500 (same as 0, snaps to final)
-  { fontFamily: "var(--font-sans)", fontWeight: 500, fontStyle: "normal", letterSpacing: "0.1em" },
-];
-
-// Mount: 0 → 1 → 2 → 3 → 4 → 0  (starts from settled, glitches, returns)
-// Hover: 1 → 2 → 3 → 4 → 0       (already settled, glitches, returns)
-const MOUNT_SEQ = [0, 1, 2, 3, 4, 0];
-const HOVER_SEQ = [1, 2, 3, 4, 0];
-const STEP_MS = 68;
 
 export default function LogoMark() {
-  const [stateIdx, setStateIdx] = useState(0);
-  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
-
-  const runSequence = useCallback((seq: number[]) => {
-    timersRef.current.forEach(clearTimeout);
-    timersRef.current = [];
-    seq.forEach((idx, i) => {
-      const t = setTimeout(() => setStateIdx(idx), i * STEP_MS);
-      timersRef.current.push(t);
-    });
-  }, []);
-
-  useEffect(() => {
-    // Small delay so the page settles before mount glitch
-    const t = setTimeout(() => runSequence(MOUNT_SEQ), 400);
-    return () => {
-      clearTimeout(t);
-      timersRef.current.forEach(clearTimeout);
-    };
-  }, [runSequence]);
-
-  const style = STATES[stateIdx];
+  const [hovered, setHovered] = useState(false);
 
   return (
-    <Link href="/" className="select-none shrink-0">
-      <div className="flex flex-col items-start" style={{ lineHeight: 1 }}>
-        <span
-          onMouseEnter={() => runSequence(HOVER_SEQ)}
-          style={{
-            fontFamily: style.fontFamily,
-            fontWeight: style.fontWeight,
-            fontStyle: style.fontStyle,
-            letterSpacing: style.letterSpacing,
-            textTransform: "uppercase",
-            fontSize: "18px",
-            color: "#EAE6E0",
-            display: "block",
-            lineHeight: 1,
-          }}
-        >
-          YEA
-        </span>
-        <span
-          style={{
-            fontFamily: "var(--font-serif)",
-            fontWeight: 300,
-            fontStyle: "italic",
-            letterSpacing: "0.08em",
-            fontSize: "10px",
-            color: "#888880",
-            display: "block",
-            marginTop: "4px",
-            lineHeight: 1,
-          }}
-        >
-          Andrew Ye
-        </span>
-      </div>
+    <Link
+      href="/"
+      className="relative overflow-hidden inline-block select-none shrink-0"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <span className="block px-2 py-0.5 text-[16px] font-medium tracking-wider uppercase text-[#EAE6E0]">
+        YEA // ANDREW YE
+      </span>
+
+      <span
+        className="absolute inset-0 bg-[#EAE6E0] pointer-events-none"
+        style={{
+          transform: hovered ? "translateX(0%)" : "translateX(-101%)",
+          transition: "transform 300ms ease-out",
+        }}
+      />
+
+      <span
+        className="absolute inset-0 flex items-center px-2 text-[16px] font-medium tracking-wider uppercase text-[#0B0A09] pointer-events-none"
+        style={{
+          clipPath: hovered ? "inset(0 0% 0 0)" : "inset(0 100% 0 0)",
+          transition: "clip-path 300ms ease-out",
+        }}
+      >
+        YEA // ANDREW YE
+      </span>
     </Link>
   );
 }

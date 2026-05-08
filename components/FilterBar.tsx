@@ -37,7 +37,7 @@ function RoleDropdown() {
     if (role) params.set("role", role.toLowerCase());
     else params.delete("role");
     const qs = params.toString();
-    router.push(qs ? `/index?${qs}` : "/index", { scroll: false });
+    router.push(qs ? `/archive?${qs}` : "/archive", { scroll: false });
     setOpen(false);
   }
 
@@ -113,7 +113,7 @@ function FilterBarInner() {
     if (value === "all") params.delete("filter");
     else params.set("filter", value);
     const qs = params.toString();
-    router.push(qs ? `/index?${qs}` : "/index", { scroll: false });
+    router.push(qs ? `/archive?${qs}` : "/archive", { scroll: false });
   }
 
   return (

@@ -144,6 +144,18 @@ function VimeoControls({
     else playerRef.current.play();
   }, [isPlaying]);
 
+  // Spacebar play/pause
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.code === "Space" && e.target === document.body) {
+        e.preventDefault();
+        handleTogglePlay();
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [handleTogglePlay]);
+
   const getScrubberProgress = (clientX: number) => {
     if (!scrubberRef.current) return 0;
     const rect = scrubberRef.current.getBoundingClientRect();

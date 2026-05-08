@@ -54,6 +54,7 @@ function MetaRow({ index, title, client, inverted = false }: MetaRowProps) {
 
 export default function ThumbnailHover({ project, index, constrainAspect }: Props) {
   const [isHovered, setIsHovered] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
   const isTouchRef = useRef(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const displayTitle = getDisplayTitle(project);
@@ -73,6 +74,7 @@ export default function ThumbnailHover({ project, index, constrainAspect }: Prop
   const handleMouseLeave = useCallback(() => {
     if (isTouchRef.current) return;
     setIsHovered(false);
+    setVideoReady(false);
     if (videoRef.current) {
       videoRef.current.pause();
       videoRef.current.currentTime = 0;
@@ -97,8 +99,8 @@ export default function ThumbnailHover({ project, index, constrainAspect }: Prop
               objectFit: constrainAspect ? "cover" : undefined,
               objectPosition: constrainAspect ? (project.thumbnailObjectPosition ?? "center") : undefined,
               filter: project.isUnreleased ? "url(#mosaic-pixelate)" : undefined,
-              opacity: isHovered && project.indexHoverVideo ? 0 : 1,
-              transition: "opacity 200ms",
+              opacity: isHovered && videoReady && project.indexHoverVideo ? 0 : 1,
+              transition: "opacity 300ms",
             }}
           />
           {project.indexHoverVideo && (
@@ -110,11 +112,12 @@ export default function ThumbnailHover({ project, index, constrainAspect }: Prop
               loop
               playsInline
               className="absolute inset-0 w-full h-full"
+              onCanPlay={() => setVideoReady(true)}
               style={{
                 objectFit: "contain",
                 filter: project.isUnreleased ? "url(#mosaic-pixelate)" : undefined,
-                opacity: isHovered ? 1 : 0,
-                transition: "opacity 200ms",
+                opacity: isHovered && videoReady ? 1 : 0,
+                transition: "opacity 300ms",
               }}
             />
           )}

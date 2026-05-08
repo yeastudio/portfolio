@@ -40,6 +40,8 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${generalSans.variable} ${newsreader.variable} h-full`}>
       <body className="min-h-full flex flex-col bg-[#0B0A09] text-[#EAE6E0] antialiased">
+        {/* Runs before first paint — hides main content until loader takes over */}
+        <script dangerouslySetInnerHTML={{ __html: `document.documentElement.classList.add('js-loading')` }} />
         {/* SVG filter definitions — globally available for mosaic pixelation on unreleased projects */}
         <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true" focusable="false">
           <defs>

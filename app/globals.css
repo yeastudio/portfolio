@@ -57,6 +57,11 @@ html {
   to   { opacity: 1; }
 }
 
+/* Hide page content instantly on parse until loader takes over */
+html.js-loading main {
+  opacity: 0;
+}
+
 /* Hide system cursor on hover-capable devices */
 @media (hover: hover) and (pointer: fine) {
   * {

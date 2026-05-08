@@ -23,6 +23,8 @@ export default function PageLoader() {
     setPhase("holding");
     setLineWidth(0);
     setOpacity(1);
+    // Loader is now covering the page — safe to reveal content underneath
+    document.documentElement.classList.remove("js-loading");
 
     // Start fill
     const t0 = setTimeout(() => setLineWidth(100), 60);

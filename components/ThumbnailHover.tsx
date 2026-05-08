@@ -105,7 +105,7 @@ export default function ThumbnailHover({ project, index, constrainAspect }: Prop
             <video
               ref={videoRef}
               src={project.indexHoverVideo}
-              preload="none"
+              preload="metadata"
               muted
               loop
               playsInline

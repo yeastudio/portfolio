@@ -173,6 +173,10 @@ function VimeoControls({
       delete document.body.dataset.cursor;
       document.removeEventListener("mousemove", onMove);
       document.removeEventListener("mouseup", onUp);
+      // Absorb the click that follows this mouseup so it can't close the lightbox
+      const absorbClick = (e: MouseEvent) => e.stopPropagation();
+      document.addEventListener("click", absorbClick, { capture: true, once: true });
+      setTimeout(() => document.removeEventListener("click", absorbClick, true), 300);
     };
 
     document.addEventListener("mousemove", onMove);
@@ -190,7 +194,7 @@ function VimeoControls({
       className="absolute inset-0"
       style={{
         opacity: uiVisible ? 1 : 0,
-        pointerEvents: videoStarted ? "auto" : "none",
+        pointerEvents: "auto",
         transition: "opacity 200ms ease",
       }}
       onMouseMove={resetHideTimer}

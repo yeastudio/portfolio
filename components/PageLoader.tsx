@@ -3,56 +3,67 @@
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 
-type Phase = "holding" | "sweeping" | "done";
+type Phase = "holding" | "fading" | "done";
 
 export default function PageLoader() {
   const pathname = usePathname();
-  const [phase, setPhase] = useState<Phase>("done"); // start hidden until we confirm first visit
+  const [phase, setPhase] = useState<Phase>("done");
   const [lineWidth, setLineWidth] = useState(0);
-  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const [opacity, setOpacity] = useState(1);
   const isFirstMount = useRef(true);
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   function clear() {
     timers.current.forEach(clearTimeout);
     timers.current = [];
   }
 
-  function runFullLoader() {
+  function run(fillDuration: number) {
     clear();
     setPhase("holding");
     setLineWidth(0);
+    setOpacity(1);
+
+    // Start fill
     const t0 = setTimeout(() => setLineWidth(100), 60);
-    const t1 = setTimeout(() => setPhase("sweeping"), 2400);
-    const t2 = setTimeout(() => setPhase("done"), 3700);
+    // Fade out once fill completes (+ small pause)
+    const t1 = setTimeout(() => {
+      setPhase("fading");
+      setOpacity(0);
+    }, fillDuration + 200);
+    // Remove from DOM after fade
+    const t2 = setTimeout(() => setPhase("done"), fillDuration + 750);
+
     timers.current = [t0, t1, t2];
   }
 
   useEffect(() => {
     if (isFirstMount.current) {
       isFirstMount.current = false;
-      // Only show the full loader on the first visit of the session
       const visited = sessionStorage.getItem("yea-visited");
       if (!visited) {
         sessionStorage.setItem("yea-visited", "true");
-        runFullLoader();
+        run(2200); // First visit: ~2.2s fill
+      } else {
+        run(1200); // Returning: ~1.2s fill
       }
       return;
     }
-    // Subsequent navigations — PageTransition handles the fade, loader stays hidden
+    // Every subsequent navigation
+    run(1200);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
   if (phase === "done") return null;
 
   return (
+    // z-40 keeps us below the header (z-50) so nav stays visible
     <div
-      className="fixed inset-0 z-[150] flex items-center justify-center bg-[#0B0A09]"
+      className="fixed inset-0 z-40 flex items-center justify-center bg-[#0B0A09]"
       style={{
-        transform: phase === "sweeping" ? "translateY(-100%)" : "translateY(0%)",
-        transition:
-          phase === "sweeping"
-            ? "transform 1.25s cubic-bezier(0.76, 0, 0.24, 1)"
-            : "none",
+        opacity,
+        transition: phase === "fading" ? "opacity 500ms ease" : "none",
+        pointerEvents: phase === "fading" ? "none" : "auto",
       }}
     >
       <div className="flex flex-col items-center gap-5">
@@ -66,7 +77,7 @@ export default function PageLoader() {
               width: `${lineWidth}%`,
               transition:
                 lineWidth === 100
-                  ? "width 2.2s cubic-bezier(0.08, 0.55, 0.35, 1)"
+                  ? "width var(--fill-dur, 1.2s) cubic-bezier(0.08, 0.55, 0.35, 1)"
                   : "none",
             }}
           />

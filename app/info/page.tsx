@@ -62,8 +62,12 @@ function EmailCopy() {
   const [copied, setCopied] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  function handleClick() {
-    navigator.clipboard.writeText("andrew@yea.studio");
+  async function handleClick() {
+    try {
+      await navigator.clipboard.writeText("andrew@yea.studio");
+    } catch {
+      // clipboard blocked — fall through and show animation anyway
+    }
     setCopied(true);
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => setCopied(false), 1800);

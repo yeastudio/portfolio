@@ -91,6 +91,7 @@ export default function ThumbnailHover({ project, index, constrainAspect }: Prop
           <img
             src={project.thumbnail}
             alt=""
+            loading="lazy"
             className={constrainAspect ? "absolute inset-0 w-full h-full" : "block w-full h-auto"}
             style={{
               objectFit: constrainAspect ? "cover" : undefined,
@@ -104,7 +105,7 @@ export default function ThumbnailHover({ project, index, constrainAspect }: Prop
             <video
               ref={videoRef}
               src={project.indexHoverVideo}
-              preload="auto"
+              preload="none"
               muted
               loop
               playsInline

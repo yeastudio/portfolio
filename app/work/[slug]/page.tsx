@@ -1,4 +1,4 @@
-export const runtime = "edge";
+export const dynamicParams = false;
 
 import { notFound } from "next/navigation";
 import { projects } from "@/data/projects";
